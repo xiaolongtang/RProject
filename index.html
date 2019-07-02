@@ -1,112 +1,83 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name ="viewport" content ="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
     <title>Nav</title>
     <script type="module" src="https://unpkg.com/@ionic/core@4.6.0/dist/ionic/ionic.esm.js"></script>
     <script nomodule src="https://unpkg.com/@ionic/core@4.6.0/dist/ionic/ionic.js"></script>
     <link href="https://unpkg.com/@ionic/core@4.6.0/css/ionic.bundle.css" rel="stylesheet">
     <style>
         :root {
-            --ion-safe-area-top: 20px;
+            --ion-safe-area-top: 18px;
             --ion-safe-area-bottom: 22px;
         }
     </style>
 </head>
+
 <body>
-<ion-app>
-    <ion-nav root="nav-home"></ion-nav>
-</ion-app>
+    <ion-app>
+        <ion-nav root="nav-home"></ion-nav>
+    </ion-app>
 
-<script>
-    window.onload=function () {
-        document.addEventListener('touchstart',function (event) {
-            if(event.touches.length>1){
+    <script>
+        window.onload = function () {
+            document.addEventListener('touchstart', function (event) {
+                if (event.touches.length > 1) {
+                    event.preventDefault();
+                }
+            });
+            var lastTouchEnd = 0;
+            document.addEventListener('touchend', function (event) {
+                var now = (new Date()).getTime();
+                if (now - lastTouchEnd <= 300) {
+                    event.preventDefault();
+                }
+                lastTouchEnd = now;
+            }, false);
+            document.addEventListener('gesturestart', function (event) {
                 event.preventDefault();
+            });
+        }
+        techs = [
+            {
+                'title': 'WIFI 密码',
+                'icon': 'angular',
+                'description': 'A powerful Javascript framework for building single page apps. Angular is open source, and maintained by Google.',
+                'color': '#E63135'
+            },
+            {
+                'title': 'Apple Store 密码',
+                'icon': 'css3',
+                'description': 'The latest version of cascading stylesheets - the styling language of the web!',
+                'color': '#0CA9EA'
+            },
+            {
+                'title': '其他密码',
+                'icon': 'html5',
+                'description': 'The latest version of the web\'s markup language.',
+                'color': '#F46529'
             }
-        });
-        var lastTouchEnd=0;
-        document.addEventListener('touchend',function (event) {
-            var now=(new Date()).getTime();
-            if(now-lastTouchEnd<=300){
-                event.preventDefault();
-            }
-            lastTouchEnd=now;
-        },false);
-        document.addEventListener('gesturestart', function (event) {
-            event.preventDefault();
-        });
-    }
-
-    techs = [
-        {
-            'title': 'Angular',
-            'icon': 'angular',
-            'description': 'A powerful Javascript framework for building single page apps. Angular is open source, and maintained by Google.',
-            'color': '#E63135'
-        },
-        {
-            'title': 'CSS3',
-            'icon': 'css3',
-            'description': 'The latest version of cascading stylesheets - the styling language of the web!',
-            'color': '#0CA9EA'
-        },
-        {
-            'title': 'HTML5',
-            'icon': 'html5',
-            'description': 'The latest version of the web\'s markup language.',
-            'color': '#F46529'
-        },
-        {
-            'title': 'JavaScript',
-            'icon': 'javascript',
-            'description': 'One of the most popular programming languages on the Web!',
-            'color': '#FFD439'
-        },
-        {
-            'title': 'Sass',
-            'icon': 'sass',
-            'description': 'Syntactically Awesome Stylesheets - a mature, stable, and powerful professional grade CSS extension.',
-            'color': '#CE6296'
-        },
-        {
-            'title': 'NodeJS',
-            'icon': 'nodejs',
-            'description': 'An open-source, cross-platform runtime environment for developing server-side Web applications.',
-            'color': '#78BD43'
-        },
-        {
-            'title': 'Python',
-            'icon': 'python',
-            'description': 'A clear and powerful object-oriented programming language!',
-            'color': '#3575AC'
-        },
-        {
-            'title': 'Markdown',
-            'icon': 'markdown',
-            'description': 'A super simple way to add formatting like headers, bold, bulleted lists, and so on to plain text.',
-            'color': '#412159'
-        },
-        {
-            'title': 'Tux',
-            'icon': 'tux',
-            'description': 'The official mascot of the Linux kernel!',
-            'color': '#000'
-        },
-    ];
-
-    customElements.define('nav-home', class NavHome extends HTMLElement {
-        connectedCallback() {
-            this.innerHTML = `
+        ];
+        customElements.define('nav-home', class NavHome extends HTMLElement {
+            connectedCallback() {
+                this.innerHTML = `
           <ion-header translucent>
             <ion-toolbar>
               <ion-title>密码</ion-title>
+
+              <ion-buttons slot="primary">
+                <ion-button>
+                    <ion-icon name="add-circle-outline" style="color: #E63135;font-size: 23px;margin-right: 20px;margin-top: 4px;"></ion-icon>
+                </ion-button>
+              </ion-buttons>
+
             </ion-toolbar>
             <ion-toolbar>
-              <ion-searchbar placeholder="搜索"></ion-searchbar>
+              <ion-searchbar placeholder="搜索" style="font-size: 16px;"></ion-searchbar>
             </ion-toolbar>
           </ion-header>
           <ion-content fullscreen>
@@ -122,21 +93,21 @@
             </ion-list>
           </ion-content>
         `;
-            const searchbar = document.querySelector('ion-searchbar');
+                const searchbar = document.querySelector('ion-searchbar');
+                searchbar.addEventListener('ionInput', handleInput);
 
-            searchbar.addEventListener('ionInput', handleInput);
+                const button = document.querySelector('ion-button');
+                button.addEventListener('click', handleButtonClick);
+            }
+        });
+        const nav = document.querySelector('ion-nav');
+        function showDetail(title) {
+            const tech = techs.find(tech => tech.title === title);
+            nav.push('nav-detail', { tech });
         }
-    });
-    const nav = document.querySelector('ion-nav');
-
-    function showDetail(title) {
-        const tech = techs.find(tech => tech.title === title);
-        nav.push('nav-detail', { tech });
-    }
-
-    customElements.define('nav-detail', class NavDetail extends HTMLElement {
-        connectedCallback() {
-            this.innerHTML = `
+        customElements.define('nav-detail', class NavDetail extends HTMLElement {
+            connectedCallback() {
+                this.innerHTML = `
           <ion-header translucent>
             <ion-toolbar>
               <ion-buttons slot="start">
@@ -150,21 +121,62 @@
             <p>${this.tech.description}</p>
           </ion-content>
         `;
-        }
-    });
-
-
-
-    function handleInput(event) {
-        const items = Array.from(document.querySelector('ion-list').children);
-        const query = event.target.value.toLowerCase();
-        requestAnimationFrame(() => {
-            items.forEach(item => {
-                const shouldShow = item.textContent.toLowerCase().indexOf(query) > -1;
-                item.style.display = shouldShow ? 'block' : 'none';
-            });
+            }
         });
-    }
-</script>
+        function handleInput(event) {
+            const items = Array.from(document.querySelector('ion-list').children);
+            const query = event.target.value.toLowerCase();
+            requestAnimationFrame(() => {
+                items.forEach(item => {
+                    const shouldShow = item.textContent.toLowerCase().indexOf(query) > -1;
+                    item.style.display = shouldShow ? 'block' : 'none';
+                });
+            });
+        }
+
+        function handleButtonClick() {
+            console.log('add button click...');
+            nav.push('nav-add');
+        }
+
+        customElements.define('nav-add', class NavDetail extends HTMLElement {
+            connectedCallback() {
+                this.innerHTML = `
+          <ion-header translucent>
+            <ion-toolbar>
+              <ion-buttons slot="start">
+                <ion-back-button defaultHref="/"></ion-back-button>
+              </ion-buttons>
+              <ion-title>添加密码</ion-title>
+            </ion-toolbar>
+          </ion-header>
+          <ion-content fullscreen class="ion-padding">
+            <form onsubmit="processForm(event)">
+
+                <ion-text color="danger">
+                    <h8>* 不要添加银行卡等重要密码</h8>
+                </ion-text>
+                <ion-list lines="full" class="ion-no-margin ion-no-padding">
+                    <ion-item>
+                        <ion-label position="stacked">密码名称 <ion-text color="danger">*</ion-text></ion-label>
+                        <ion-input required type="text" oninput="handleFirstNameValue(event)"></ion-input>
+                    </ion-item>
+
+                    <ion-item>
+                        <ion-label position="stacked">密码 <ion-text color="danger">*</ion-text></ion-label>
+                        <ion-input required type="text" oninput="handleLastNameValue(event)"></ion-input>
+                    </ion-item>
+                 </ion-list>
+
+                <div class="ion-padding">
+                    <ion-button expand="block" type="submit" class="ion-no-margin">Create account</ion-button>
+                </div>
+            </form>
+          </ion-content>
+        `;
+            }
+        });
+    </script>
 </body>
+<!--https://github.com/ionic-team/ionic-docs/blob/master/src/demos/api/input/index.html-->
 </html>
