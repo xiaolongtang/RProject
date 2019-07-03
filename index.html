@@ -20,7 +20,7 @@
 
 <body>
     <ion-app>
-        <ion-nav root="nav-home"></ion-nav>
+        <ion-nav root="nav-home" swipeGesture="true"></ion-nav>
     </ion-app>
 
     <script>
@@ -111,7 +111,7 @@
           <ion-header translucent>
             <ion-toolbar>
               <ion-buttons slot="start">
-                <ion-back-button defaultHref="/"></ion-back-button>
+                <ion-back-button defaultHref="/" ></ion-back-button>
               </ion-buttons>
               <ion-title>${this.tech.title}</ion-title>
             </ion-toolbar>
@@ -135,7 +135,6 @@
         }
 
         function handleButtonClick() {
-            console.log('add button click...');
             nav.push('nav-add');
         }
 
@@ -145,7 +144,7 @@
           <ion-header translucent>
             <ion-toolbar>
               <ion-buttons slot="start">
-                <ion-back-button defaultHref="/"></ion-back-button>
+                <ion-back-button defaultHref="/" color="danger" text="返回"></ion-back-button>
               </ion-buttons>
               <ion-title>添加密码</ion-title>
             </ion-toolbar>
@@ -159,23 +158,45 @@
                 <ion-list lines="full" class="ion-no-margin ion-no-padding">
                     <ion-item>
                         <ion-label position="stacked">密码名称 <ion-text color="danger">*</ion-text></ion-label>
-                        <ion-input required type="text" oninput="handleFirstNameValue(event)"></ion-input>
+                        <ion-input required type="text" oninput="handlePassNameValue(event)"></ion-input>
                     </ion-item>
 
                     <ion-item>
                         <ion-label position="stacked">密码 <ion-text color="danger">*</ion-text></ion-label>
-                        <ion-input required type="text" oninput="handleLastNameValue(event)"></ion-input>
+                        <ion-input required type="text" oninput="handlePassValue(event)"></ion-input>
                     </ion-item>
                  </ion-list>
 
                 <div class="ion-padding">
-                    <ion-button expand="block" type="submit" class="ion-no-margin">Create account</ion-button>
+                    <ion-button expand="block" type="submit" class="ion-no-margin" color="danger">创建密码</ion-button>
                 </div>
             </form>
+            <ion-loading-controller></ion-loading-controller>
           </ion-content>
         `;
+        
             }
         });
+
+        const loadingController = document.querySelector('ion-loading-controller');
+        let passName;
+        let pass;
+        function processForm(event) {
+            event.preventDefault();
+            loadingController.create({
+                message: "正在存储",
+                duration: 30000
+            }).then(loading => loading.present());
+            console.log('pass name:'+passName);
+            console.log('pass:'+pass);
+        }
+
+        function handlePassNameValue(event) {
+            passName = event.target.value;
+        }
+        function handlePassValue(event) {
+            pass = event.target.value;
+        }
     </script>
 </body>
 <!--https://github.com/ionic-team/ionic-docs/blob/master/src/demos/api/input/index.html-->
