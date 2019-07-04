@@ -139,7 +139,7 @@
         }
 
         customElements.define('nav-add', class NavDetail extends HTMLElement {
-            connectedCallback() {
+            async connectedCallback() {
                 this.innerHTML = `
           <ion-header translucent>
             <ion-toolbar>
@@ -174,18 +174,21 @@
             <ion-loading-controller></ion-loading-controller>
           </ion-content>
         `;
-        
+        // const loadingController = document.querySelector('ion-loading-controller');
+        // await  loadingController.componentOnReady();
             }
         });
 
-        const loadingController = document.querySelector('ion-loading-controller');
+        
         let passName;
         let pass;
-        function processForm(event) {
+        async function processForm(event) {
             event.preventDefault();
-            loadingController.create({
+            const loadingController = document.querySelector('ion-loading-controller');
+            await  loadingController.componentOnReady();
+            await loadingController.create({
                 message: "正在存储",
-                duration: 30000
+                duration: 3000
             }).then(loading => loading.present());
             console.log('pass name:'+passName);
             console.log('pass:'+pass);
