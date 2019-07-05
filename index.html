@@ -42,20 +42,26 @@
                 event.preventDefault();
             });
         }
-        techs = [
-            {
+        /**
+         * {
                 'title': 'WIFI 密码',
                 'description': '123321'
-            },
-            {
-                'title': 'Apple Store 密码',
-                'description': '21223'
-            },
-            {
-                'title': '其他密码',
-                'description': 'sdfdxd'
             }
-        ];
+         */
+        techs = getLocalData();
+
+        function getLocalData(){
+            if(localStorage.getItem('myPWD')==null) {
+                var emptyList = [];
+                localStorage.setItem('myPWD', JSON.stringify(emptyList));
+            }
+            return JSON.parse(localStorage.getItem('myPWD'));
+        }
+
+        function saveAllData(){
+            localStorage.setItem('myPWD', JSON.stringify(techs));
+        }
+
         customElements.define('nav-home', class NavHome extends HTMLElement {
             connectedCallback() {
                 this.innerHTML = `
@@ -76,14 +82,25 @@
           </ion-header>
           <ion-content fullscreen>
             <ion-list>
-            ${techs.map(tech => `
-                <ion-item button onclick="showDetail('${tech.title}')">
+
+            ${techs.map((tech,index) => `
+                <ion-item-sliding>
+                <ion-item button onclick="showDetail('${tech.title}')" id="${index}">
                   <ion-icon slot="start" name="lock" style="color: #E63135;"></ion-icon>
                   <ion-label>
                     <h3>${tech.title}</h3>
                   </ion-label>
                 </ion-item>
+                <ion-item-options>
+            <ion-item-option color="danger" onClick="deletePassItem(${index})">
+                <ion-icon slot="end" name="trash"></ion-icon>
+                    删除
+                </ion-item-option>
+            </ion-item-options>
+            </ion-item-sliding>
             `).join('\n')}
+
+
             </ion-list>
           </ion-content>
         `;
@@ -97,18 +114,34 @@
         const nav = document.querySelector('ion-nav');
 
 
-        function createListItem(title) {
-            let item = document.createElement('ion-item');
-            item.setAttribute('button',true);
-            item.setAttribute('onclick',"showDetail('"+title+"')");
+        function createListItem(title,index) {
+            let item = document.createElement('ion-item-sliding');
+            // item.setAttribute('button',true);
+            // item.setAttribute('onclick',"showDetail('"+title+"')");
 
             item.innerHTML = `
-                <ion-icon slot="start" name="lock" style="color: #E63135;"></ion-icon>
+                <ion-item button onclick="showDetail('${title}')" id="${index}">
+                  <ion-icon slot="start" name="lock" style="color: #E63135;"></ion-icon>
                   <ion-label>
                     <h3>${title}</h3>
                   </ion-label>
+                </ion-item>
+                <ion-item-options>
+            <ion-item-option color="danger" onClick="deletePassItem(${index})">
+                <ion-icon slot="end" name="trash"></ion-icon>
+                    删除
+                </ion-item-option>
+            </ion-item-options>
       `;
             return item;
+        }
+
+        function deletePassItem(item){
+            techs.splice(item,1);
+            const itemPWD =document.querySelector('ion-list').children[item];
+            const list=document.querySelector('ion-list');
+            list.removeChild(itemPWD);
+            saveAllData();
         }
 
         function showDetail(title) {
@@ -198,17 +231,14 @@
                 message: "正在存储",
                 duration: 30000
             }).then(loading => loading.present());
-            console.log('pass name:'+passName);
-            console.log('pass:'+pass);
             techs.push({'title': passName,
-                'description': pass})
+                'description': pass});
+            saveAllData();
             await  loadingController.dismiss();
-            // list.appendChild(createMessage(passName));
             nav.popToRoot();
             console.log(techs);
             const list = document.querySelector('ion-list');
-            list.appendChild(createListItem(passName));
-            // nav.setRoot(nav.getActive().component);
+            list.appendChild(createListItem(passName,techs.length-1));
         }
 
         function handlePassNameValue(event) {
