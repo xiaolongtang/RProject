@@ -92,7 +92,7 @@
                   </ion-label>
                 </ion-item>
                 <ion-item-options>
-            <ion-item-option color="danger" onClick="deletePassItem(${index})">
+            <ion-item-option color="danger" onClick="deletePassItem('${tech.title}')">
                 <ion-icon slot="end" name="trash"></ion-icon>
                     删除
                 </ion-item-option>
@@ -116,9 +116,6 @@
 
         function createListItem(title,index) {
             let item = document.createElement('ion-item-sliding');
-            // item.setAttribute('button',true);
-            // item.setAttribute('onclick',"showDetail('"+title+"')");
-
             item.innerHTML = `
                 <ion-item button onclick="showDetail('${title}')" id="${index}">
                   <ion-icon slot="start" name="lock" style="color: #E63135;"></ion-icon>
@@ -127,7 +124,7 @@
                   </ion-label>
                 </ion-item>
                 <ion-item-options>
-            <ion-item-option color="danger" onClick="deletePassItem(${index})">
+            <ion-item-option color="danger" onClick="deletePassItem('${title}')">
                 <ion-icon slot="end" name="trash"></ion-icon>
                     删除
                 </ion-item-option>
@@ -136,14 +133,17 @@
             return item;
         }
 
-        function deletePassItem(item){
-            console.log(item);
-            techs.splice(item,1);
-            const itemPWD =document.querySelector('ion-list').children[item];
-            const list=document.querySelector('ion-list');
-            list.removeChild(itemPWD);
-            saveAllData();
-            window.location.reload();
+        function deletePassItem(titleName){
+            const items = Array.from(document.querySelectorAll('ion-item'));
+            items.forEach((item,index)=>{
+                if(item.textContent.trim()==titleName){
+                    const itemPWD =document.querySelector('ion-list').children[index];
+                    const list=document.querySelector('ion-list');
+                    list.removeChild(itemPWD);
+                    techs.splice(index,1);
+                    saveAllData();
+                }
+            });
         }
 
         function showDetail(title) {
@@ -233,14 +233,19 @@
                 message: "正在存储",
                 duration: 30000
             }).then(loading => loading.present());
+            const newTech = techs.find(tech => tech.title == passName);
+            if(newTech!=null){
+                alert("密码名称已经存在");
+                await  loadingController.dismiss();
+            }else{
             techs.push({'title': passName,
                 'description': pass});
             saveAllData();
             await  loadingController.dismiss();
             nav.popToRoot();
-            console.log(techs);
             const list = document.querySelector('ion-list');
             list.appendChild(createListItem(passName,techs.length-1));
+            }
         }
 
         function handlePassNameValue(event) {
