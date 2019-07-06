@@ -137,11 +137,13 @@
         }
 
         function deletePassItem(item){
+            console.log(item);
             techs.splice(item,1);
             const itemPWD =document.querySelector('ion-list').children[item];
             const list=document.querySelector('ion-list');
             list.removeChild(itemPWD);
             saveAllData();
+            window.location.reload();
         }
 
         function showDetail(title) {
